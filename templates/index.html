@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>식당 추천 시스템</title>
+</head>
+<body>
+    <h1>식당 추천 시스템</h1>
+    <form action="/recommend" method="post">
+        <h3>기준별 중요도를 선택하세요 (1: 낮음 ~ 5: 높음)</h3>
+
+        <label for="맛있음">맛있음:</label>
+        <input type="radio" id="맛있음" name="맛있음" value="1"> 1
+        <input type="radio" id="맛있음" name="맛있음" value="2"> 2
+        <input type="radio" id="맛있음" name="맛있음" value="3"> 3
+        <input type="radio" id="맛있음" name="맛있음" value="4"> 4
+        <input type="radio" id="맛있음" name="맛있음" value="5"> 5<br><br>
+
+        <label for="위생">위생:</label>
+        <input type="radio" id="위생" name="위생" value="1"> 1
+        <input type="radio" id="위생" name="위생" value="2"> 2
+        <input type="radio" id="위생" name="위생" value="3"> 3
+        <input type="radio" id="위생" name="위생" value="4"> 4
+        <input type="radio" id="위생" name="위생" value="5"> 5<br><br>
+
+        <label for="서비스">서비스:</label>
+        <input type="radio" id="서비스" name="서비스" value="1"> 1
+        <input type="radio" id="서비스" name="서비스" value="2"> 2
+        <input type="radio" id="서비스" name="서비스" value="3"> 3
+        <input type="radio" id="서비스" name="서비스" value="4"> 4
+        <input type="radio" id="서비스" name="서비스" value="5"> 5<br><br>
+
+        <label for="분위기">분위기:</label>
+        <input type="radio" id="분위기" name="분위기" value="1"> 1
+        <input type="radio" id="분위기" name="분위기" value="2"> 2
+        <input type="radio" id="분위기" name="분위기" value="3"> 3
+        <input type="radio" id="분위기" name="분위기" value="4"> 4
+        <input type="radio" id="분위기" name="분위기" value="5"> 5<br><br>
+
+        <label for="위치접근성">위치접근성:</label>
+        <input type="radio" id="위치접근성" name="위치접근성" value="1"> 1
+        <input type="radio" id="위치접근성" name="위치접근성" value="2"> 2
+        <input type="radio" id="위치접근성" name="위치접근성" value="3"> 3
+        <input type="radio" id="위치접근성" name="위치접근성" value="4"> 4
+        <input type="radio" id="위치접근성" name="위치접근성" value="5"> 5<br><br>
+
+        <label for="대기시간">대기시간:</label>
+        <input type="radio" id="대기시간" name="대기시간" value="1"> 1
+        <input type="radio" id="대기시간" name="대기시간" value="2"> 2
+        <input type="radio" id="대기시간" name="대기시간" value="3"> 3
+        <input type="radio" id="대기시간" name="대기시간" value="4"> 4
+        <input type="radio" id="대기시간" name="대기시간" value="5"> 5<br><br>
+
+        <label for="가성비">가성비:</label>
+        <input type="radio" id="가성비" name="가성비" value="1"> 1
+        <input type="radio" id="가성비" name="가성비" value="2"> 2
+        <input type="radio" id="가성비" name="가성비" value="3"> 3
+        <input type="radio" id="가성비" name="가성비" value="4"> 4
+        <input type="radio" id="가성비" name="가성비" value="5"> 5<br><br>
+
+        <label for="가격">가격:</label>
+        <input type="radio" id="가격" name="가격" value="1"> 1
+        <input type="radio" id="가격" name="가격" value="2"> 2
+        <input type="radio" id="가격" name="가격" value="3"> 3
+        <input type="radio" id="가격" name="가격" value="4"> 4
+        <input type="radio" id="가격" name="가격" value="5"> 5<br><br>
+
+        <!-- 최소 점수 기준 -->
+        <label for="score_threshold">최소 점수 기준:</label>
+        <input type="number" id="score_threshold" name="score_threshold" placeholder="0"><br><br>
+
+        <!-- 상위 N개 입력 -->
+        <label for="top_n">상위 N개의 식당:</label>
+        <input type="number" id="top_n" name="top_n" placeholder="5" required><br><br>
+
+        <!-- 정렬 기준 -->
+        <label for="sort_by">정렬 기준:</label>
+        <select id="sort_by" name="sort_by">
+            <option value="평균 점수">평균 점수</option>
+            <option value="광고성 리뷰 포함">광고성 리뷰 포함</option>
+            <option value="광고성 리뷰 제거">광고성 리뷰 제거</option>
+        </select><br><br>
+
+        <button type="submit">추천 받기</button>
+    </form>
+</body>
+</html>
