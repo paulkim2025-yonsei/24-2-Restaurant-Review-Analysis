@@ -116,3 +116,127 @@
 
 - **팀명**: 연세대학교 산업공학과 학회 PIE DS 24-2 전공 스터디  
 - **구성원**: 강태희, 고민지, 김건우(팀장), 김세원, 김채연, 안성진
+
+
+---
+---
+
+# Shinchon Restaurant Recommendation System
+
+**Presentation Slides**: [DS Final Presentation.pdf](DS최종발표.pdf)
+
+---
+
+## 1. Project Overview
+
+- **Objective**  
+  Classify and remove “promotional reviews” from Naver Blog review data, (Naver is Korean version of Google!) 
+  then compute sentiment scores for each restaurant attribute (Deliciousness·Hygiene·Service·Atmosphere·Accessibility·Waiting Time·Cost-Effectiveness·Price) and combine them with user-selected weights to recommend the best restaurant.
+
+- **Main Steps**  
+  1. **Crawling** (`crowling.py`)  
+  2. **Data Analysis** (`clustering.ipynb`, `pca.ipynb`, `topic.ipynb`)  
+  3. **Promotional Review Classification Model Training** (`model.py`)  
+  4. **Promotional Review Filtering** (`adv_filtering.py`)  
+  5. **Web Visualization (Flask)** (`visualization.py`, `templates/index.html`, `templates/result.html`)
+
+---
+
+## 2. Key Files
+
+### `crowling.py`
+- **Function**: Uses Selenium to infinite-scroll and click “More” on Naver Map reviews to collect all entries.  
+- **Input**: `hashtag_lists` containing pairs of restaurant names and identifiers.  
+- **Output**: `식당명_리뷰.xlsx`
+
+### `clustering.ipynb`
+- **Function**: Performs K-Means clustering on `pca.npy` features; compares Calinski–Harabasz and Silhouette scores.  
+- **Output**: `clustering.csv`
+
+### `pca.ipynb`
+- **Function**: Loads `ft.npy` (LSTM-Attention feature vectors), applies MinMaxScaler, then PCA.  
+- **Output**: `pca.npy`
+
+### `model.py`
+- **Function**:  
+  1. Loads FastText (`cc.ko.300.bin`) and `stopwords.json`.  
+  2. Merges `data_연남.csv` and `data_신촌.csv` for promotional (1) vs. non-promotional (0) labeling.  
+  3. Trains an LSTM-Attention classifier → saves `model.pth` and `ft.npy`.
+
+### `adv_filtering.py`
+- **Function**:  
+  1. Loads `model.pth` → removes any review with promotional probability > 0.9.  
+  2. Filters the original datasets (`data1.csv`, etc.) → outputs `data1_filtered.csv`.
+
+### `visualization.py`
+- **Function**: Flask web server that:  
+  - Compares `summary_광고비처리.xlsx` vs. `summary_찐리뷰만.xlsx`.  
+  - Calculates recommendation scores based on user-entered weights (Deliciousness·Hygiene·Service·Atmosphere·Accessibility·Waiting Time·Cost-Effectiveness·Price).  
+  - Renders Plotly bar charts in `templates/result.html`.
+
+### `templates/index.html`
+- Presents a form for users to select attribute weights, minimum score threshold, top-N results, and sorting preference.
+
+### `templates/result.html`
+- Displays the computed charts and a “Try Again” link.
+
+---
+
+## 3. Modeling (Techniques & Theory)
+
+- **Word Embedding**  
+  - FastText (`cc.ko.300.bin`): subword-level training to mitigate OOV issues.  
+  - Preprocessing: regex → morphological analysis (Okt) → remove stopwords (`stopwords.json` + date/time list) → pad to max length of 800 tokens.
+
+- **LSTM-Attention Classification Model**  
+  - **Attention Monitoring**: Continuously inspect attention maps; refine stopword list as needed.  
+  - **Architecture**:  
+    self.lstm   = nn.LSTM(input_dim=300, hidden_dim=32, batch_first=True)  
+    self.weight = nn.Linear(seq_len, seq_len)  
+    self.fc     = nn.Linear(hidden_dim * seq_len, 1)  
+  - **Manual Stopword Refinement**: Used `CheckAttention` to identify 3,171 non-core tokens and add them to the stopword list to correct misclassifications.
+
+- **Dimensionality Reduction & Clustering**  
+  1. Applied t-SNE and PCA for 2D/3D visualization.  
+  2. Determined optimal number of clusters using the Calinski–Harabasz index (inter- vs. intra-cluster variance) and Silhouette score (cohesion vs. separation).  
+  3. Selected **8 clusters** corresponding to the classes: 맛있음 (deliciousness), 위생 (hygiene), 서비스 (service), 분위기 (atmosphere), 위치접근성 (accessibility), 대기시간 (waiting time), 가성비 (cost-effectiveness), 가격 (price).
+
+- **Sentiment Analysis**  
+  - For each class, used a predefined set of core keywords.  
+  - Applied a cosine similarity threshold of ≥ 1/3 to decide positive vs. negative sentiment.
+
+- **Recommendation Score Calculation**  
+  ranked_weights = {c: w * (len(rank) - i) for i, c in enumerate(rank)}  
+  summary_df['recommendation_score'] = summary_df.apply(  
+      lambda r: r['positive_ratio(%)'] * ranked_weights.get(r['class'], 0),  
+      axis=1  
+  )
+
+---
+
+## 4. Results
+
+- **Promotional Review Classification Performance**  
+  - F1 Score: **0.9811**  
+  - Accuracy: **0.9685**
+
+- **Filtering Impact**  
+  - At a 0.9 probability threshold, **20–30%** of all reviews were removed as promotional.
+
+- **Class-wise Sentiment Example**  
+  - For Restaurant 1’s “맛있음” class: out of 25 reviews, 13 were positive and 12 negative → **52% positive**.
+
+- **Recommendation System Comparison**  
+  - **With vs. Without Promotional Reviews**  
+    - **탐복**: score increased after filtering → truly popular spot  
+    - **구도로통닭**: score spiked before filtering → likely driven by viral/promotion-heavy content
+
+- **Web Service Deployment**  
+  - A live web service was deployed (link not publicly shared).
+
+---
+
+## Team & Contributions
+
+- **Team**: PIE DS 24-2 Major Study, Industrial Engineering Society, Yonsei University  
+- **Members**: 강태희, 고민지, 김건우(KIM GEONWOO, Team Leader), 김세원, 김채연, 안성진
